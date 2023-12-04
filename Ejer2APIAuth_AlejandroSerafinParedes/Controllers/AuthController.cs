@@ -32,8 +32,11 @@ namespace Ejer2API_AlejandroSerafinParedes.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // si no es valido devuelve badrequest del modelstate
                 return BadRequest(ModelState);
             }
+
+            // se crea la variable usuario para recoger el correo del usuario
 
             var user = await _userManager.FindByNameAsync(auth.Email);
             if (user == null || !await _userManager.CheckPasswordAsync(user, auth.Password))
@@ -49,24 +52,9 @@ namespace Ejer2API_AlejandroSerafinParedes.Controllers
                 return StatusCode(500, "Internal Server Error: JWT secret key not configured.");
             }
 
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var keyBytes = Encoding.ASCII.GetBytes(key);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Role, "User")
-                }),
-                Expires = DateTime.UtcNow.AddDays(7),
-                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
-            };
-
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            return Ok(new
-            {
-                token = tokenHandler.WriteToken(token)
-            });
+            // devolver el metodo createtoken y por parametro el usuario
+            var token = await CreateToken(user);
+            return Ok(token);
         }
         /*[HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] Auth auth)
@@ -91,11 +79,9 @@ namespace Ejer2API_AlejandroSerafinParedes.Controllers
             var algo = _configuration["Jwt:Issuer"];
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:Key"]));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var token = new JwtSecurityToken(
-            _configuration["Jwt:Issuer"],
-            _configuration["Jwt:Audience"],
-            claims,
-            expires: DateTime.UtcNow.AddMinutes(10), // modifiquen el tiempo de duración del token
+            var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],_configuration["Jwt:Audience"],
+                claims,
+                expires: DateTime.UtcNow.AddMinutes(10), // modifiquen el tiempo de duración del token
             signingCredentials: credentials);
             return new JwtSecurityTokenHandler().WriteToken(token);
         }

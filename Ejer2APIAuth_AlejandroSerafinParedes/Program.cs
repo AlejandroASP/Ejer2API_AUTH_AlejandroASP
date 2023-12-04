@@ -10,7 +10,8 @@ using Microsoft.AspNetCore.Builder;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<Ejer2API_AlejandroSerafinParedesContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Ejer2API_AlejandroSerafinParedesContext") ?? throw new InvalidOperationException("Connection string 'Ejer2API_AlejandroSerafinParedesContext' not found.")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Ejer2API_AlejandroSerafinParedesContext") ?? 
+    throw new InvalidOperationException("Connection string 'Ejer2API_AlejandroSerafinParedesContext' not found.")));
 
 //----------------------------------------------------------------------------------------------------------------------------------
 builder.Services.AddDbContext<UsersContext>(options =>
